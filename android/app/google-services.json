@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "507245936860",
+    "project_id": "lazaro-18bf3",
+    "storage_bucket": "lazaro-18bf3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507245936860:android:e4ef620e1f246dba493419",
+        "android_client_info": {
+          "package_name": "com.example.lazaro_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "507245936860-0gi95ttu7h634sjo6kiej0bov0riofho.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPcnUoKUj1QnrT6q95tH4ry_nUXtATLDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "507245936860-0gi95ttu7h634sjo6kiej0bov0riofho.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

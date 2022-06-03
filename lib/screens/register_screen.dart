@@ -10,9 +10,30 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('RegisterScreen'),
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const SizedBox(height: 40),
+            const SizedBox(
+              height: 200,
+              child: Image(image: AssetImage('assets/1-removebg-preview.png')),
+            ),
+            const SizedBox(height: 4),
+            ChangeNotifierProvider(
+              create: (_) => LoginFormProvider(),
+              child: const _LoginForm(),
+            ),
+            // const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => Navigator.pushReplacementNamed(context, 'login'),
+              child: const Text(
+                '¿Ya tienes una cuenta?',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -85,16 +106,16 @@ class _LoginForm extends StatelessWidget {
                     if (!loginForm.isValidForm()) return;
                     loginForm.isLoading = true;
                     // await Future.delayed(const Duration(seconds: 2));
-                    final String? errorMessage =
-                        await authService.login(loginForm.mail, loginForm.pass);
+                    final String? errorMessage = await authService.createUser(
+                        loginForm.mail, loginForm.pass);
                     if (errorMessage == null) {
                       Navigator.pushReplacementNamed(context, 'home');
                     } else {
-                      if (errorMessage == 'EMAIL_NOT_FOUND') {
-                        NotificationService.showSnackBar('Email no encontrado');
-                      } else if (errorMessage == 'INVALID_PASSWORD') {
+                      //TODO: Mostrar error en pantalla
+                      print(errorMessage);
+                      if (errorMessage == 'EMAIL_EXISTS') {
                         NotificationService.showSnackBar(
-                            'Contraseña incorrecta');
+                            'Ya existe una cuenta');
                       }
                       loginForm.isLoading = false;
                     }
@@ -111,7 +132,7 @@ class _LoginForm extends StatelessWidget {
                   width: 10,
                 ),
                 Text(
-                  loginForm.isLoading ? 'Espere...' : 'Login',
+                  loginForm.isLoading ? 'Espere...' : 'Crear cuenta',
                   style: const TextStyle(color: Colors.white, fontSize: 24),
                 ),
               ],

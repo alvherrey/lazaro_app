@@ -16,10 +16,9 @@ class LoginScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 40),
-            Container(
+            const SizedBox(
               height: 200,
-              child: const Image(
-                  image: AssetImage('assets/1-removebg-preview.png')),
+              child: Image(image: AssetImage('assets/1-removebg-preview.png')),
             ),
             const SizedBox(height: 4),
             ChangeNotifierProvider(
@@ -134,7 +133,7 @@ class _LoginForm extends StatelessWidget {
                   width: 10,
                 ),
                 Text(
-                  loginForm.isLoading ? 'Espere...' : 'Login',
+                  loginForm.isLoading ? 'Espere...' : 'Ingresar',
                   style: const TextStyle(color: Colors.white, fontSize: 24),
                 ),
               ],

@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
         leading: IconButton(
           onPressed: () {
             authService.logout();
-            Navigator.pushReplacementNamed(context, 'auth');
+            Navigator.pushReplacementNamed(context, 'login');
           },
           icon: const Icon(Icons.logout),
         ),

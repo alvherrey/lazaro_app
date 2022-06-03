@@ -31,9 +31,9 @@ class MyApp extends StatelessWidget {
       scaffoldMessengerKey: NotificationService.messengerKey,
       debugShowCheckedModeBanner: false,
       title: 'Lazaro App',
-      initialRoute: 'auth',
+      initialRoute: 'login',
       routes: {
-        'auth': (_) => const LoginScreen(),
+        'login': (_) => const LoginScreen(),
         'home': (_) => const HomeScreen(),
         'register': (_) => const RegisterScreen(),
       },
