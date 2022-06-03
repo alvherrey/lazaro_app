@@ -52,6 +52,7 @@ class _LoginForm extends StatelessWidget {
       child: Column(
         children: [
           TextFormField(
+            initialValue: 'lazaro@gmail.com',
             autovalidateMode: AutovalidateMode.onUserInteraction,
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
@@ -74,6 +75,7 @@ class _LoginForm extends StatelessWidget {
             height: 4,
           ),
           TextFormField(
+            initialValue: '123456',
             autovalidateMode: AutovalidateMode.onUserInteraction,
             autocorrect: false,
             obscureText: true,

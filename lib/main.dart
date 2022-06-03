@@ -36,6 +36,9 @@ class MyApp extends StatelessWidget {
         'login': (_) => const LoginScreen(),
         'home': (_) => const HomeScreen(),
         'register': (_) => const RegisterScreen(),
+        'user_id': (_) => const UserIdScreen(),
+        'storage': (_) => const StorageScreen(),
+        'plantilla': (_) => const PlantillaScreen(),
       },
     );
   }

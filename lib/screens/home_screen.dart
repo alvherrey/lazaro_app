@@ -17,22 +17,68 @@ class HomeScreen extends StatelessWidget {
           onPressed: () {
             authService.logout();
             Navigator.pushReplacementNamed(context, 'login');
+            print('log out');
           },
           icon: const Icon(Icons.logout),
         ),
       ),
-      body: Center(
-        child: FutureBuilder<String?>(
-          future: authService.readLocalId(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              String data = snapshot.data!;
-              return Text(data);
-            } else {
-              return const Text('waiting');
-            }
-          },
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: const [
+            // const SizedBox(height: 40),
+            SizedBox(
+              height: 200,
+              child: Image(image: AssetImage('assets/1-removebg-preview.png')),
+            ),
+            SizedBox(height: 16),
+            HomeButton(
+              icon: Icons.perm_identity_outlined,
+              text: 'User Id',
+              goto: 'user_id',
+            ),
+            SizedBox(height: 8),
+            HomeButton(
+              icon: Icons.storage_outlined,
+              text: 'Storage',
+              goto: 'storage',
+            ),
+            SizedBox(height: 8),
+            HomeButton(
+              icon: Icons.more_horiz,
+              text: 'Plantilla',
+              goto: 'plantilla',
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class HomeButton extends StatelessWidget {
+  final String text;
+  final IconData icon;
+  final String goto;
+
+  const HomeButton({
+    Key? key,
+    required this.text,
+    required this.icon,
+    required this.goto,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+      icon: Icon(icon, size: 32),
+      onPressed: () {
+        Navigator.of(context).pushNamed(goto);
+      },
+      label: Text(
+        text,
+        style: const TextStyle(fontSize: 24),
       ),
     );
   }
