@@ -2,26 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lazaro_app/services/services.dart';
+import 'package:lazaro_app/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context, listen: false);
+    // final authService = Provider.of<AuthService>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lázaro'),
-        leading: IconButton(
-          onPressed: () {
-            authService.logout();
-            Navigator.pushReplacementNamed(context, 'login');
-            print('log out');
-          },
-          icon: const Icon(Icons.logout),
+        title: const Text(
+          'Inicio',
+          style: TextStyle(fontSize: 24),
         ),
+        // leading: IconButton(
+        // onPressed: () {
+        //   authService.logout();
+        //   Navigator.pushReplacementNamed(context, 'login');
+        //   print('log out');
+        // },
+        //   icon: const Icon(Icons.logout),
+        // ),
       ),
+      drawer: const SideMenu(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -29,7 +34,7 @@ class HomeScreen extends StatelessWidget {
             // const SizedBox(height: 40),
             SizedBox(
               height: 200,
-              child: Image(image: AssetImage('assets/1-removebg-preview.png')),
+              child: Image(image: AssetImage('assets/logo_text.png')),
             ),
             SizedBox(height: 16),
             HomeButton(

@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lazaro_app/providers/providers.dart';
 import 'package:lazaro_app/screens/screens.dart';
 import 'package:lazaro_app/services/services.dart';
+import 'package:lazaro_app/shared_preferences/preferences.dart';
 
-void main() => runApp(const AppState());
+// void main() => runApp(const AppState());
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Preferences.init();
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(isDarkmode: Preferences.isDarkmode),
+        )
+      ],
+      child: const AppState(),
+    ),
+  );
+}
 
 class AppState extends StatelessWidget {
   const AppState({Key? key}) : super(key: key);
@@ -26,8 +43,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // theme: ThemeData.light(),
-      // theme: ThemeData.dark(),
       scaffoldMessengerKey: NotificationService.messengerKey,
       debugShowCheckedModeBanner: false,
       title: 'Lazaro App',
@@ -39,7 +54,9 @@ class MyApp extends StatelessWidget {
         'user_id': (_) => const UserIdScreen(),
         'storage': (_) => const StorageScreen(),
         'plantilla': (_) => const PlantillaScreen(),
+        'settings': (_) => const SettingsScreen(),
       },
+      theme: Provider.of<ThemeProvider>(context).currentTheme,
     );
   }
 }

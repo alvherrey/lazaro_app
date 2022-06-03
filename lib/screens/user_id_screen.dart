@@ -16,7 +16,10 @@ class UserIdScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('Lázaro'),
+        title: const Text(
+          'User Id',
+          style: TextStyle(fontSize: 24),
+        ),
       ),
       body: Center(
         child: FutureBuilder<String?>(

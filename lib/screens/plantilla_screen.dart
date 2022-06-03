@@ -11,7 +11,10 @@ class PlantillaScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('Lázaro'),
+        title: const Text(
+          'Plantilla',
+          style: TextStyle(fontSize: 24),
+        ),
       ),
       body: const Center(
         child: Text('PlantillaScreen'),

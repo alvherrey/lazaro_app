@@ -18,7 +18,7 @@ class RegisterScreen extends StatelessWidget {
             const SizedBox(height: 40),
             const SizedBox(
               height: 200,
-              child: Image(image: AssetImage('assets/1-removebg-preview.png')),
+              child: Image(image: AssetImage('assets/logo_text.png')),
             ),
             const SizedBox(height: 4),
             ChangeNotifierProvider(
