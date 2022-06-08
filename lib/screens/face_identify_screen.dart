@@ -216,7 +216,7 @@ class _FaceIdentifyScreenState extends State<FaceIdentifyScreen> {
           ),
         ],
       ),
-      drawer: const SideMenu(),
+      // drawer: const SideMenu(),
       body: SingleChildScrollView(
         controller: _scrollController,
         padding: const EdgeInsets.all(16),
@@ -259,7 +259,6 @@ class _FaceIdentifyScreenState extends State<FaceIdentifyScreen> {
               ),
             ),
 
-            const SizedBox(height: 32),
             loading
                 ? Column(
                     children: const [
