@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lazaro_app/shared_preferences/preferences.dart';
+import 'package:provider/provider.dart';
 
 import 'package:lazaro_app/models/models.dart';
 import 'package:lazaro_app/providers/providers.dart';
@@ -35,24 +36,22 @@ class _KnownFaceScreenBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context, listen: false);
     final knownFaceForm = Provider.of<KnownFaceFormProvider>(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: knownFacesService.isSaving
             ? null
             : () async {
+                // TODO revisar el tema de que hay que pulsar guardar dos veces, para actualizar una imagen
                 FocusScopeNode currentFocus = FocusScope.of(context);
                 if (!currentFocus.hasPrimaryFocus) {
                   currentFocus.unfocus();
                 }
                 if (!knownFaceForm.isValidForm()) return;
                 final String name = knownFaceForm.getName();
-                final String localId = await authService.readLocalId();
+                final String localId = Preferences.localId;
                 final String? imageUrl =
                     await knownFacesService.uplaodImage2(localId, name);
-                // final String? imageUrl = await knownFacesService.uplaodImage();
-
                 if (knownFaceForm.knownFace.picture != null) {
                   await CachedNetworkImage.evictFromCache(
                       knownFaceForm.knownFace.picture!);
@@ -95,15 +94,12 @@ class _KnownFaceScreenBody extends StatelessWidget {
                   top: 30,
                   child: IconButton(
                     onPressed: () async {
-                      //TODO: camara o galeria
-                      final ImagePicker _picker = ImagePicker();
+                      final ImagePicker picker = ImagePicker();
                       final XFile? photo =
-                          await _picker.pickImage(source: ImageSource.camera);
+                          await picker.pickImage(source: ImageSource.camera);
                       if (photo == null) {
-                        print('no selecciono nada');
                         return;
                       }
-                      print('Tenemos imagen ${photo.path}');
                       knownFacesService.updateSelectedKownFaceImage(photo.path);
                     },
                     icon: const Icon(
@@ -118,15 +114,12 @@ class _KnownFaceScreenBody extends StatelessWidget {
                   top: 30,
                   child: IconButton(
                     onPressed: () async {
-                      //TODO: camara o galeria
-                      final ImagePicker _picker = ImagePicker();
+                      final ImagePicker picker = ImagePicker();
                       final XFile? photo =
-                          await _picker.pickImage(source: ImageSource.gallery);
+                          await picker.pickImage(source: ImageSource.gallery);
                       if (photo == null) {
-                        print('no selecciono nada');
                         return;
                       }
-                      print('Tenemos imagen ${photo.path}');
                       knownFacesService.updateSelectedKownFaceImage(photo.path);
                     },
                     icon: const Icon(
