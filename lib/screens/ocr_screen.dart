@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -26,12 +25,11 @@ class _OcrScreenState extends State<OcrScreen> {
   late FlutterTts flutterTts;
   String? language = 'es-ES';
   String? engine;
-  double volume = 0.5;
+  double volume = 0.7;
   double pitch = 1.0;
   double rate = 0.55;
   bool isCurrentLanguageInstalled = true;
   String? _newVoiceText;
-  int? _inputLength;
   TtsState ttsState = TtsState.stopped;
 
   get isPlaying => ttsState == TtsState.playing;
@@ -81,7 +79,6 @@ class _OcrScreenState extends State<OcrScreen> {
     RecognizedText recognizedText = await textDetector.processImage(inputImage);
     await textDetector.close();
     scannedText = '';
-
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
         scannedText = scannedText + line.text + '\n';
@@ -207,7 +204,6 @@ class _OcrScreenState extends State<OcrScreen> {
     if (result == 1) setState(() => ttsState = TtsState.stopped);
   }
 
-  // Init State
   @override
   void initState() {
     super.initState();
