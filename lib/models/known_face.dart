@@ -8,7 +8,7 @@ class KnownFace {
   KnownFace({
     required this.name,
     this.picture,
-    this.age,
+    required this.age,
     required this.relation,
     this.id,
     this.localId,
@@ -16,7 +16,7 @@ class KnownFace {
 
   String name;
   String? picture;
-  int? age;
+  String age;
   String relation;
   String? id;
   String? localId;

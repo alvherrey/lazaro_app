@@ -20,7 +20,7 @@ class OcrScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: const [
               Text(
-                'Haz una foto, o seleccionala desde la galería.\n\nAutomaticamente lee el contenido del texto.',
+                'Haz una foto, o selecciona una imagen de la galería.\n\nAutomaticamente detecta que rostros hay en la foto.',
                 style: TextStyle(fontSize: 24),
               ),
               SizedBox(

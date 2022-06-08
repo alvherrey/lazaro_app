@@ -139,7 +139,7 @@ class KnownFacesScreen extends StatelessWidget {
         child: const Icon(Icons.add),
         onPressed: () {
           knownFacesService.selectedKnownFace =
-              KnownFace(name: '', relation: '', age: 0);
+              KnownFace(name: '', relation: '', age: '');
           Navigator.pushNamed(context, 'known_face');
         },
       ),

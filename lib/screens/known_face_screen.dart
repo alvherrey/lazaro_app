@@ -79,8 +79,8 @@ class _KnownFaceScreenBody extends StatelessWidget {
                 KnownFaceImage(
                     url: knownFacesService.selectedKnownFace.picture),
                 Positioned(
-                  left: 30,
-                  top: 50,
+                  left: 20,
+                  top: 30,
                   child: IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(
@@ -91,8 +91,8 @@ class _KnownFaceScreenBody extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  right: 50,
-                  top: 50,
+                  right: 40,
+                  top: 30,
                   child: IconButton(
                     onPressed: () async {
                       //TODO: camara o galeria
@@ -114,8 +114,8 @@ class _KnownFaceScreenBody extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  right: 100,
-                  top: 50,
+                  right: 90,
+                  top: 30,
                   child: IconButton(
                     onPressed: () async {
                       //TODO: camara o galeria
@@ -154,9 +154,6 @@ class _KnownFaceScreenBody extends StatelessWidget {
                     fontSize: 24),
               ),
             ),
-            // const SizedBox(
-            //   height: 100,
-            // )
           ],
         ),
       ),
@@ -215,13 +212,7 @@ class _KnownFaceForm extends StatelessWidget {
                   FilteringTextInputFormatter.allow(
                       RegExp(r'^(\d+)?\.?\d{0,2}'))
                 ],
-                onChanged: (value) {
-                  if (int.tryParse(value) == null) {
-                    knownFace.age = 0;
-                  } else {
-                    knownFace.age = value as int?;
-                  }
-                },
+                onChanged: (value) => knownFace.age = value,
               ),
               const SizedBox(height: 4),
               TextFormField(
@@ -241,17 +232,9 @@ class _KnownFaceForm extends StatelessWidget {
   }
 
   BoxDecoration _buildBoxDecoration() => const BoxDecoration(
-        // color: Colors.white,
         borderRadius: BorderRadius.only(
           bottomRight: Radius.circular(16),
           bottomLeft: Radius.circular(16),
         ),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black26,
-        //     blurRadius: 10,
-        //     offset: Offset(0, 7),
-        //   ),
-        // ],
       );
 }
