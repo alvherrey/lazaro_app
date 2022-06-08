@@ -29,7 +29,7 @@ class UserIdScreen extends StatelessWidget {
               String data = snapshot.data!;
               return Text(data);
             } else {
-              return const Text('waiting');
+              return Container();
             }
           },
         ),

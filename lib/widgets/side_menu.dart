@@ -37,7 +37,9 @@ class SideMenu extends StatelessWidget {
               'Usuario',
               style: TextStyle(fontSize: 24),
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushReplacementNamed(context, 'user');
+            },
           ),
           ListTile(
             leading: const Icon(

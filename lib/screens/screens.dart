@@ -1,7 +1,16 @@
+export 'package:lazaro_app/screens/coin_screen.dart';
+export 'package:lazaro_app/screens/face_identify_screen.dart';
+export 'package:lazaro_app/screens/home_more_screen.dart';
 export 'package:lazaro_app/screens/home_screen.dart';
+export 'package:lazaro_app/screens/image_caption_screen.dart';
+export 'package:lazaro_app/screens/known_face_screen.dart';
+export 'package:lazaro_app/screens/known_faces_screen.dart';
+export 'package:lazaro_app/screens/loading_screen.dart';
 export 'package:lazaro_app/screens/login_screen.dart';
+export 'package:lazaro_app/screens/ocr_screen.dart';
 export 'package:lazaro_app/screens/plantilla_screen.dart';
+export 'package:lazaro_app/screens/qr_screen.dart';
 export 'package:lazaro_app/screens/register_screen.dart';
 export 'package:lazaro_app/screens/settings_screen.dart';
-export 'package:lazaro_app/screens/storage_screen.dart';
 export 'package:lazaro_app/screens/user_id_screen.dart';
+export 'package:lazaro_app/screens/user_screen.dart';

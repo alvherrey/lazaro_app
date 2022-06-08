@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:lazaro_app/shared_preferences/preferences.dart';
 import 'package:lazaro_app/providers/providers.dart';
 import 'package:lazaro_app/services/services.dart';
 import 'package:lazaro_app/ui/input_decorations.dart';
@@ -71,9 +72,7 @@ class _LoginForm extends StatelessWidget {
                   : 'Introduce un correo electronico';
             },
           ),
-          const SizedBox(
-            height: 4,
-          ),
+          const SizedBox(height: 4),
           TextFormField(
             initialValue: '123456',
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -109,10 +108,16 @@ class _LoginForm extends StatelessWidget {
                     if (!loginForm.isValidForm()) return;
                     loginForm.isLoading = true;
                     // await Future.delayed(const Duration(seconds: 2));
+                    // TODO importante quitar el mock del login
+                    // final String? errorMessage =
+                    //     await authService.login(loginForm.mail, loginForm.pass);
                     final String? errorMessage =
-                        await authService.login(loginForm.mail, loginForm.pass);
+                        await authService.login('lazaro@gmail.com', '123456');
                     if (errorMessage == null) {
                       Navigator.pushReplacementNamed(context, 'home');
+                      Preferences.localId = await authService.readLocalId();
+                      print(
+                          'iniciado sesion con localId: ${Preferences.localId}');
                     } else {
                       if (errorMessage == 'EMAIL_NOT_FOUND') {
                         NotificationService.showSnackBar('Email no encontrado');

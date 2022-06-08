@@ -4,8 +4,10 @@ class Preferences {
   static late SharedPreferences _preferences;
 
   static String _name = '';
-  static bool _isDarkmode = false;
+  static String _localId = '';
   static int _gender = 1;
+  static String _age = '';
+  static bool _isDarkmode = false;
 
   static Future init() async {
     _preferences = await SharedPreferences.getInstance();
@@ -20,13 +22,22 @@ class Preferences {
     _preferences.setString('name', name);
   }
 
-  static bool get isDarkmode {
-    return _preferences.getBool('isDarkmode') ?? _isDarkmode;
+  static String get localId {
+    return _preferences.getString('localId') ?? _localId;
   }
 
-  static set isDarkmode(bool isDarkmode) {
-    _isDarkmode = isDarkmode;
-    _preferences.setBool('isDarkmode', isDarkmode);
+  static set localId(String localId) {
+    _localId = localId;
+    _preferences.setString('localId', localId);
+  }
+
+  static String get age {
+    return _preferences.getString('age') ?? _age;
+  }
+
+  static set age(String age) {
+    _age = age;
+    _preferences.setString('age', age);
   }
 
   static int get gender {
@@ -36,5 +47,14 @@ class Preferences {
   static set gender(int gender) {
     _gender = gender;
     _preferences.setInt('gender', gender);
+  }
+
+  static bool get isDarkmode {
+    return _preferences.getBool('isDarkmode') ?? _isDarkmode;
+  }
+
+  static set isDarkmode(bool isDarkmode) {
+    _isDarkmode = isDarkmode;
+    _preferences.setBool('isDarkmode', isDarkmode);
   }
 }

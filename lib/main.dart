@@ -31,6 +31,7 @@ class AppState extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => KnownFacesService()),
       ],
       child: const MyApp(),
     );
@@ -50,11 +51,19 @@ class MyApp extends StatelessWidget {
       routes: {
         'login': (_) => const LoginScreen(),
         'home': (_) => const HomeScreen(),
+        'home_more': (_) => HomeMoreScreen(),
         'register': (_) => const RegisterScreen(),
         'user_id': (_) => const UserIdScreen(),
-        'storage': (_) => const StorageScreen(),
+        'known_faces': (_) => const KnownFacesScreen(),
+        'known_face': (_) => const KnownFaceScreen(),
         'plantilla': (_) => const PlantillaScreen(),
         'settings': (_) => const SettingsScreen(),
+        'user': (_) => const UserScreen(),
+        'face_identify': (_) => const FaceIdentifyScreen(),
+        'ocr': (_) => const OcrScreen(),
+        'image_caption': (_) => const ImageCaptionScreen(),
+        'qr': (_) => const QrScreen(),
+        'coin': (_) => const CoinScreen(),
       },
       theme: Provider.of<ThemeProvider>(context).currentTheme,
     );
