@@ -85,9 +85,54 @@ class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
     }
   }
 
+  // Predictions
+  void getImageCamera() async {
+    try {
+      final XFile? pickedImage =
+          await _picker.pickImage(source: ImageSource.camera);
+      if (pickedImage != null) {
+        File imageFile = File(pickedImage.path);
+        Uint8List imageRaw = await imageFile.readAsBytes();
+        _imageFile = pickedImage;
+        _imageRaw = imageRaw;
+        _loading = true;
+        _predictions = null;
+        _textoTraducido = null;
+        setState(() {});
+        if (_imageFile != null && _imageRaw != null) {
+          await getPredictions().then((value) async {
+            _predictions = value;
+            _loading = false;
+            setState(() {});
+            if (_predictions != null) {
+              if (_predictions!.isNotEmpty) {
+                _textoTraducido = await translator
+                    .translate(_predictions![0]['caption'], to: 'es');
+                setState(() {});
+                if (_textoTraducido != null) {
+                  _newVoiceText = _textoTraducido.toString();
+                  setState(() {});
+                  await Future.delayed(const Duration(milliseconds: 300), () {
+                    scrollDown();
+                    setState(() {});
+                    _speak();
+                    setState(() {});
+                  });
+                }
+              }
+            }
+          });
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<List?> getPredictions() async {
     try {
-      var url = Uri.parse('http://192.168.9.12:5000/model/predict');
+      var url =
+          Uri.parse('https://des.digitalonboarding.es/lazaro/caption/predict');
       var imageUploadRequest = http.MultipartRequest('POST', url);
       var multipartFile = http.MultipartFile.fromBytes(
         'image',
@@ -294,7 +339,9 @@ class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
               style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50)),
               icon: const Icon(Icons.camera_alt_outlined, size: 32),
-              onPressed: () {},
+              onPressed: () {
+                getImageCamera();
+              },
               label: const Text(
                 'Cámara',
                 style: TextStyle(fontSize: 24),
