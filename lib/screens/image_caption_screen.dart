@@ -1,8 +1,85 @@
+import 'dart:io';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
-class ImageCaptionScreen extends StatelessWidget {
+class ImageCaptionScreen extends StatefulWidget {
   const ImageCaptionScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ImageCaptionScreen> createState() => _ImageCaptionScreenState();
+}
+
+enum TtsState { playing, stopped, paused, continued }
+
+class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final ImagePicker _picker = ImagePicker();
+  XFile? imageFile;
+  String scannedText = '';
+  bool loading = false;
+  double _currentSliderValue = 40;
+
+  // TTS
+  late FlutterTts flutterTts;
+  String? language = 'es-ES';
+  String? engine;
+  double volume = 0.7;
+  double pitch = 1.0;
+  double rate = 0.55;
+  bool isCurrentLanguageInstalled = true;
+  String? _newVoiceText;
+  TtsState ttsState = TtsState.stopped;
+
+  get isPlaying => ttsState == TtsState.playing;
+  get isStopped => ttsState == TtsState.stopped;
+  get isPaused => ttsState == TtsState.paused;
+  get isContinued => ttsState == TtsState.continued;
+
+  void getImageGallery() async {
+    try {
+      final XFile? pickedImage =
+          await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedImage != null) {
+        loading = true;
+        imageFile = pickedImage;
+        setState(() {});
+        getImageCaptions(pickedImage);
+      }
+    } catch (e) {
+      loading = false;
+      imageFile = null;
+      setState(() {});
+      scannedText = 'Error al escanear';
+    }
+  }
+
+  void getImageCamera() async {
+    try {
+      final XFile? pickedImage =
+          await _picker.pickImage(source: ImageSource.camera);
+      if (pickedImage != null) {
+        loading = true;
+        imageFile = pickedImage;
+        setState(() {});
+        getImageCaptions(pickedImage);
+      }
+    } catch (e) {
+      loading = false;
+      imageFile = null;
+      setState(() {});
+      scannedText = 'Error al escanear';
+    }
+  }
+
+  void getImageCaptions(XFile image) async {
+    await Future.delayed(const Duration(milliseconds: 300), () {
+      scrollDown();
+      setState(() {});
+    });
+    setState(() {});
+  }
 
   void displayHelp(BuildContext context) {
     showDialog(
@@ -21,7 +98,7 @@ class ImageCaptionScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: const [
               Text(
-                'Haz una foto, o seleccionala desde la galería.\n\nAutomaticamente describe el entorno que te rodea.',
+                'Haz una foto, o selecciona una imagen de la galería.\n\nAutomaticamente describe el entorno que te rodea.',
                 style: TextStyle(fontSize: 24),
               ),
               SizedBox(
@@ -45,6 +122,80 @@ class ImageCaptionScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  void scrollDown() async {
+    _scrollController.animateTo(400,
+        duration: const Duration(milliseconds: 1000), curve: Curves.ease);
+  }
+
+  void scrollUp() async {
+    _scrollController.animateTo(0,
+        duration: const Duration(milliseconds: 1000), curve: Curves.ease);
+  }
+
+  initTts() {
+    flutterTts = FlutterTts();
+    _setAwaitOptions();
+    _getDefaultEngine();
+
+    flutterTts.setStartHandler(() {
+      setState(() {
+        ttsState = TtsState.playing;
+      });
+    });
+
+    flutterTts.setCompletionHandler(() {
+      setState(() {
+        ttsState = TtsState.stopped;
+      });
+    });
+
+    flutterTts.setCancelHandler(() {
+      setState(() {
+        ttsState = TtsState.stopped;
+      });
+    });
+
+    flutterTts.setErrorHandler((msg) {
+      setState(() {
+        print("error: $msg");
+        ttsState = TtsState.stopped;
+      });
+    });
+    flutterTts.setLanguage('es-ES');
+  }
+
+  Future _getDefaultEngine() async {
+    var engine = await flutterTts.getDefaultEngine;
+    if (engine != null) {}
+  }
+
+  Future _speak() async {
+    await flutterTts.setVolume(volume);
+    await flutterTts.setSpeechRate(rate);
+    await flutterTts.setPitch(pitch);
+
+    if (_newVoiceText != null) {
+      if (_newVoiceText!.isNotEmpty) {
+        await flutterTts.speak(_newVoiceText!);
+      }
+    }
+  }
+
+  Future _setAwaitOptions() async {
+    await flutterTts.awaitSpeakCompletion(true);
+  }
+
+  Future _stop() async {
+    var result = await flutterTts.stop();
+    if (result == 1) setState(() => ttsState = TtsState.stopped);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initTts();
   }
 
   @override
@@ -85,9 +236,144 @@ class ImageCaptionScreen extends StatelessWidget {
           //     )),
         ],
       ),
-      body: Center(
-        child: Text('ImageCaptionScreen'),
+      body: SingleChildScrollView(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            const SizedBox(
+              height: 200,
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(
+                  FontAwesomeIcons.landmark,
+                  size: 150,
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50)),
+              icon: const Icon(Icons.camera_alt_outlined, size: 32),
+              onPressed: () {
+                getImageGallery();
+              },
+              label: const Text(
+                'Cámara',
+                style: TextStyle(fontSize: 24),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50)),
+              icon: const Icon(Icons.photo_outlined, size: 32),
+              onPressed: () {
+                getImageGallery();
+              },
+              label: const Text(
+                'Galería',
+                style: TextStyle(fontSize: 24),
+              ),
+            ),
+            const SizedBox(height: 32),
+            loading
+                ? const CircularProgressIndicator()
+                : Column(
+                    children: [
+                      Text(
+                        scannedText,
+                        style: TextStyle(
+                          fontSize: _currentSliderValue,
+                        ),
+                      ),
+                    ],
+                  ),
+            imageFile != null && !loading
+                ? Image.file(File(imageFile!.path))
+                : const SizedBox(),
+          ],
+        ),
       ),
+      persistentFooterButtons: <Widget>[
+        Container(
+          child: _playStopSection(context),
+        )
+      ],
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(
+          Icons.arrow_upward_outlined,
+          size: 32,
+        ),
+        onPressed: () {
+          scrollUp();
+        },
+      ),
+    );
+  }
+
+  Widget _playStopSection(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildCustomButton(Colors.white, Icons.play_arrow, 'Play', _speak),
+            _buildCustomButton(Colors.white, Icons.stop, 'Stop', _stop),
+          ],
+        ),
+        _rateSlider(),
+        _sizeSlider(),
+      ],
+    );
+  }
+
+  Material _buildCustomButton(
+      Color color, IconData icon, String label, Function func) {
+    return Material(
+      child: InkWell(
+        onTap: () => func(),
+        child: Container(
+          padding: const EdgeInsets.only(right: 16, top: 8),
+          child: Row(
+            children: [
+              Icon(icon, size: 32),
+              const SizedBox(width: 8),
+              Text(label, style: const TextStyle(fontSize: 24)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _rateSlider() {
+    return Slider(
+      value: rate,
+      divisions: 10,
+      onChanged: (newRate) {
+        setState(() => rate = newRate);
+      },
+      min: 0.1,
+      max: 1.0,
+      label: "Velocidad",
+    );
+  }
+
+  Widget _sizeSlider() {
+    return Slider(
+      value: _currentSliderValue,
+      divisions: 10,
+      min: 20,
+      max: 60,
+      label: 'Tamaño: ${_currentSliderValue.round().toString()}',
+      onChanged: (double value) {
+        setState(() {
+          _currentSliderValue = value;
+        });
+      },
     );
   }
 }

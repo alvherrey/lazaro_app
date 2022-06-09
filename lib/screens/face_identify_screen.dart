@@ -223,7 +223,7 @@ class _FaceIdentifyScreenState extends State<FaceIdentifyScreen> {
         child: Column(
           children: [
             // const SizedBox(height: 40),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             const SizedBox(
               height: 200,
               child: Padding(
@@ -288,7 +288,8 @@ class _FaceIdentifyScreenState extends State<FaceIdentifyScreen> {
         children: strings
             .map((item) => Text(
                   item,
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 32, fontWeight: FontWeight.bold),
                 ))
             .toList());
   }

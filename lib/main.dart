@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lazaro_app/providers/providers.dart';
+import 'package:lazaro_app/screens/ocr_screen.dart';
 import 'package:lazaro_app/screens/screens.dart';
 import 'package:lazaro_app/services/services.dart';
 import 'package:lazaro_app/shared_preferences/preferences.dart';
