@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lazaro_app/screens/directions_history_screen.dart';
+import 'package:lazaro_app/screens/maps_history_screen.dart';
+import 'package:provider/provider.dart';
+
+import 'package:lazaro_app/providers/providers.dart';
+import 'package:lazaro_app/widgets/custom_navigation_bar.dart';
+import 'package:lazaro_app/widgets/scan_button.dart';
 
 class QrScreen extends StatelessWidget {
   const QrScreen({Key? key}) : super(key: key);
@@ -77,17 +84,49 @@ class QrScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Padding(
-          //     padding: const EdgeInsets.only(left: 10.0, right: 20),
-          //     child: GestureDetector(
-          //       onTap: () {},
-          //       child: Icon(Icons.more_vert),
-          //     )),
         ],
       ),
-      body: Center(
-        child: Text('QrScreen'),
-      ),
+      body: const _HomeScreenBody(),
+      bottomNavigationBar: const CustomNavigationBar(),
+      floatingActionButton: const ScanButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+}
+
+class _HomeScreenBody extends StatelessWidget {
+  const _HomeScreenBody({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Obtener UiProvider
+    final uiProvider = Provider.of<UiProvider>(context);
+    final currentIndex = uiProvider.selectedMenuOption;
+
+    // //TODO: Temporal acciones con la base de datos
+    // final tempScan = ScanModel(valor: 'http://google.com');
+    // // Añadir un nuevo scan con el ScanModel de tempScan
+    // DBProvider.db.nuevoScan(tempScan);
+    // // Imprimir un scan por ID
+    // DBProvider.db.getScanById(112).then((scan) => print(scan?.valor));
+    // // Imprimir todos los Scans
+    // DBProvider.db.getTodosLosScans().then(print);
+    // // Borrar todos los registros
+    // DBProvider.db.deleteAllScans();
+
+    // Usar el ScanListProvider
+    final scanListProvider =
+        Provider.of<ScanListProvider>(context, listen: false);
+
+    switch (currentIndex) {
+      case 0:
+        scanListProvider.cargarScansPorTipo('geo');
+        return const MapsHistoryScreen();
+      case 1:
+        scanListProvider.cargarScansPorTipo('http');
+        return const DirectionsHistoryScreen();
+      default:
+        return const DirectionsHistoryScreen();
+    }
   }
 }

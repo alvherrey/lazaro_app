@@ -7,6 +7,7 @@ export 'package:lazaro_app/screens/known_face_screen.dart';
 export 'package:lazaro_app/screens/known_faces_screen.dart';
 export 'package:lazaro_app/screens/loading_screen.dart';
 export 'package:lazaro_app/screens/login_screen.dart';
+export 'package:lazaro_app/screens/map_screen.dart';
 export 'package:lazaro_app/screens/ocr_screen.dart';
 export 'package:lazaro_app/screens/plantilla_screen.dart';
 export 'package:lazaro_app/screens/qr_screen.dart';

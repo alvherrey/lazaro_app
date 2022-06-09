@@ -32,6 +32,8 @@ class AppState extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => KnownFacesService()),
+        ChangeNotifierProvider(create: (_) => UiProvider()),
+        ChangeNotifierProvider(create: (_) => ScanListProvider()),
       ],
       child: const MyApp(),
     );
@@ -64,6 +66,7 @@ class MyApp extends StatelessWidget {
         'image_caption': (_) => const ImageCaptionScreen(),
         'qr': (_) => const QrScreen(),
         'coin': (_) => const CoinScreen(),
+        'map': (_) => const MapScreen(),
       },
       theme: Provider.of<ThemeProvider>(context).currentTheme,
     );
