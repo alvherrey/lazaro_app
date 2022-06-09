@@ -1,8 +1,14 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-import 'package:flutter_tts/flutter_tts.dart';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:translator/translator.dart';
 
 class ImageCaptionScreen extends StatefulWidget {
   const ImageCaptionScreen({Key? key}) : super(key: key);
@@ -14,12 +20,101 @@ class ImageCaptionScreen extends StatefulWidget {
 enum TtsState { playing, stopped, paused, continued }
 
 class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
+  // Class private variables
+  final translator = GoogleTranslator();
   final ScrollController _scrollController = ScrollController();
-  final ImagePicker _picker = ImagePicker();
-  XFile? imageFile;
-  String scannedText = '';
-  bool loading = false;
   double _currentSliderValue = 40;
+  final ImagePicker _picker = ImagePicker();
+  XFile? _imageFile;
+  Uint8List? _imageRaw;
+  bool _loading = false;
+  List? _predictions;
+  Translation? _textoTraducido;
+
+  void scrollUp() async {
+    _scrollController.animateTo(0,
+        duration: const Duration(milliseconds: 1000), curve: Curves.ease);
+  }
+
+  void scrollDown() async {
+    _scrollController.animateTo(380,
+        duration: const Duration(milliseconds: 1000), curve: Curves.ease);
+  }
+
+  // Predictions
+  void getImageGallery() async {
+    try {
+      final XFile? pickedImage =
+          await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedImage != null) {
+        File imageFile = File(pickedImage.path);
+        Uint8List imageRaw = await imageFile.readAsBytes();
+        _imageFile = pickedImage;
+        _imageRaw = imageRaw;
+        _loading = true;
+        _predictions = null;
+        _textoTraducido = null;
+        setState(() {});
+        if (_imageFile != null && _imageRaw != null) {
+          await getPredictions().then((value) async {
+            _predictions = value;
+            _loading = false;
+            setState(() {});
+            if (_predictions != null) {
+              if (_predictions!.isNotEmpty) {
+                _textoTraducido = await translator
+                    .translate(_predictions![0]['caption'], to: 'es');
+                setState(() {});
+                if (_textoTraducido != null) {
+                  _newVoiceText = _textoTraducido.toString();
+                  setState(() {});
+                  await Future.delayed(const Duration(milliseconds: 300), () {
+                    scrollDown();
+                    setState(() {});
+                    _speak();
+                    setState(() {});
+                  });
+                }
+              }
+            }
+          });
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<List?> getPredictions() async {
+    try {
+      var url = Uri.parse('http://192.168.9.12:5000/model/predict');
+      var imageUploadRequest = http.MultipartRequest('POST', url);
+      var multipartFile = http.MultipartFile.fromBytes(
+        'image',
+        _imageRaw!,
+        filename: 'test.jpg', // use the real name if available, or omit
+        contentType: MediaType('image', 'jpg'),
+      );
+      imageUploadRequest.files.add(multipartFile);
+      final streamResponse =
+          await imageUploadRequest.send().timeout(const Duration(seconds: 5));
+      final response = await http.Response.fromStream(streamResponse);
+      if (response.statusCode != 200) {
+        return null;
+      }
+      final decodedData = json.decode(response.body);
+      return decodedData['predictions'];
+    } on TimeoutException catch (e) {
+      print(e);
+      return null;
+    } on SocketException catch (e) {
+      print(e);
+      return null;
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
 
   // TTS
   late FlutterTts flutterTts;
@@ -31,108 +126,12 @@ class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
   bool isCurrentLanguageInstalled = true;
   String? _newVoiceText;
   TtsState ttsState = TtsState.stopped;
+  File image2 = File('assets/logo.png');
 
   get isPlaying => ttsState == TtsState.playing;
   get isStopped => ttsState == TtsState.stopped;
   get isPaused => ttsState == TtsState.paused;
   get isContinued => ttsState == TtsState.continued;
-
-  void getImageGallery() async {
-    try {
-      final XFile? pickedImage =
-          await _picker.pickImage(source: ImageSource.gallery);
-      if (pickedImage != null) {
-        loading = true;
-        imageFile = pickedImage;
-        setState(() {});
-        getImageCaptions(pickedImage);
-      }
-    } catch (e) {
-      loading = false;
-      imageFile = null;
-      setState(() {});
-      scannedText = 'Error al escanear';
-    }
-  }
-
-  void getImageCamera() async {
-    try {
-      final XFile? pickedImage =
-          await _picker.pickImage(source: ImageSource.camera);
-      if (pickedImage != null) {
-        loading = true;
-        imageFile = pickedImage;
-        setState(() {});
-        getImageCaptions(pickedImage);
-      }
-    } catch (e) {
-      loading = false;
-      imageFile = null;
-      setState(() {});
-      scannedText = 'Error al escanear';
-    }
-  }
-
-  void getImageCaptions(XFile image) async {
-    await Future.delayed(const Duration(milliseconds: 300), () {
-      scrollDown();
-      setState(() {});
-    });
-    setState(() {});
-  }
-
-  void displayHelp(BuildContext context) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          elevation: 5,
-          title: const Text(
-            'Ayuda',
-            style: TextStyle(fontSize: 36),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              Text(
-                'Haz una foto, o selecciona una imagen de la galería.\n\nAutomaticamente describe el entorno que te rodea.',
-                style: TextStyle(fontSize: 24),
-              ),
-              SizedBox(
-                height: 36,
-              ),
-              Icon(
-                FontAwesomeIcons.landmark,
-                size: 70,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'Aceptar',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void scrollDown() async {
-    _scrollController.animateTo(400,
-        duration: const Duration(milliseconds: 1000), curve: Curves.ease);
-  }
-
-  void scrollUp() async {
-    _scrollController.animateTo(0,
-        duration: const Duration(milliseconds: 1000), curve: Curves.ease);
-  }
 
   initTts() {
     flutterTts = FlutterTts();
@@ -192,6 +191,50 @@ class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
     if (result == 1) setState(() => ttsState = TtsState.stopped);
   }
 
+  // Display help
+  void displayHelp(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          elevation: 5,
+          title: const Text(
+            'Ayuda',
+            style: TextStyle(fontSize: 36),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Text(
+                'Haz una foto, o selecciona una imagen de la galería.\n\nAutomaticamente describe el entorno que te rodea.',
+                style: TextStyle(fontSize: 24),
+              ),
+              SizedBox(
+                height: 36,
+              ),
+              Icon(
+                FontAwesomeIcons.landmark,
+                size: 70,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Aceptar',
+                style: TextStyle(fontSize: 24),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -228,12 +271,6 @@ class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
               ),
             ),
           ),
-          // Padding(
-          //     padding: const EdgeInsets.only(left: 10.0, right: 20),
-          //     child: GestureDetector(
-          //       onTap: () {},
-          //       child: Icon(Icons.more_vert),
-          //     )),
         ],
       ),
       body: SingleChildScrollView(
@@ -257,9 +294,7 @@ class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
               style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50)),
               icon: const Icon(Icons.camera_alt_outlined, size: 32),
-              onPressed: () {
-                getImageGallery();
-              },
+              onPressed: () {},
               label: const Text(
                 'Cámara',
                 style: TextStyle(fontSize: 24),
@@ -278,21 +313,22 @@ class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
                 style: TextStyle(fontSize: 24),
               ),
             ),
+            // const SizedBox(height: 32),
+            // loading ? const CircularProgressIndicator() : const SizedBox(),
+            // if (predictions != null)
+            //   predictions!.isNotEmpty ? getTextWidgets(captions!) : Container(),
+            // const SizedBox(height: 32),
+            // imageFile != null && !loading
+            //     ? Image.file(File(imageFile!.path))
+            //     : Container(),
             const SizedBox(height: 32),
-            loading
-                ? const CircularProgressIndicator()
-                : Column(
-                    children: [
-                      Text(
-                        scannedText,
-                        style: TextStyle(
-                          fontSize: _currentSliderValue,
-                        ),
-                      ),
-                    ],
-                  ),
-            imageFile != null && !loading
-                ? Image.file(File(imageFile!.path))
+            _loading ? const CircularProgressIndicator() : const SizedBox(),
+            _textoTraducido != null
+                ? Text(_textoTraducido.toString())
+                : const SizedBox(),
+            const SizedBox(height: 32),
+            _imageFile != null && _textoTraducido != null
+                ? Image.file(File(_imageFile!.path))
                 : const SizedBox(),
           ],
         ),
@@ -325,7 +361,7 @@ class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
           ],
         ),
         _rateSlider(),
-        _sizeSlider(),
+        // _sizeSlider(),
       ],
     );
   }
@@ -375,5 +411,16 @@ class _ImageCaptionScreenState extends State<ImageCaptionScreen> {
         });
       },
     );
+  }
+
+  Widget getTextWidgets(List<String> strings) {
+    return Column(
+        children: strings
+            .map((item) => Text(
+                  item,
+                  style: const TextStyle(
+                      fontSize: 32, fontWeight: FontWeight.bold),
+                ))
+            .toList());
   }
 }
