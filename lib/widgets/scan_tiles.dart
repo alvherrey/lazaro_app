@@ -33,7 +33,6 @@ class ScanTiles extends StatelessWidget {
             tipo == 'http'
                 ? FontAwesomeIcons.link
                 : FontAwesomeIcons.locationDot,
-            color: Theme.of(context).primaryColor,
             size: 32,
           ),
           title: Text(
