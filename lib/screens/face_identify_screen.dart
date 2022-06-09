@@ -258,16 +258,9 @@ class _FaceIdentifyScreenState extends State<FaceIdentifyScreen> {
                 style: TextStyle(fontSize: 24),
               ),
             ),
+            const SizedBox(height: 32),
 
-            loading
-                ? Column(
-                    children: const [
-                      SizedBox(height: 16),
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16)
-                    ],
-                  )
-                : Container(),
+            loading ? const CircularProgressIndicator() : const SizedBox(),
 
             if (predictions != null)
               predictions!.isNotEmpty
