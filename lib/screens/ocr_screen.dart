@@ -264,7 +264,7 @@ class _OcrScreenState extends State<OcrScreen> {
                   minimumSize: const Size.fromHeight(50)),
               icon: const Icon(Icons.camera_alt_outlined, size: 32),
               onPressed: () {
-                getImageGallery();
+                getImageCamera();
               },
               label: const Text(
                 'Cámara',
