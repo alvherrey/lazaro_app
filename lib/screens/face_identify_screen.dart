@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:lazaro_app/shared_preferences/preferences.dart';
-import 'package:image/image.dart' as img;
-
-import 'package:lazaro_app/widgets/widgets.dart';
 
 class FaceIdentifyScreen extends StatefulWidget {
   const FaceIdentifyScreen({Key? key}) : super(key: key);
