@@ -16,9 +16,40 @@ class CoinScreen extends StatefulWidget {
 class _CoinScreenState extends State<CoinScreen> {
   final ImagePicker _picker = ImagePicker();
   XFile? _imageFile;
+  Image? _imageResult;
+  int? _totalAmount;
   Map? _coins;
   bool _loading = false;
   final ScrollController _scrollController = ScrollController();
+
+  String processText(Map coins) {
+    String outText = '';
+    for (var entry in coins['coins'].entries) {
+      if ((entry.value['count']) > 0) {
+        if ((entry.value['count']) > 1) {
+          outText = '$outText${entry.value['count']} monedas de ${entry.key}\n';
+        } else {
+          outText = '$outText${entry.value['count']} moneda de ${entry.key}\n';
+        }
+      }
+    }
+    return outText;
+  }
+
+  void scrollUp() async {
+    _scrollController.animateTo(0,
+        duration: const Duration(milliseconds: 1000), curve: Curves.ease);
+  }
+
+  void scrollDown() async {
+    _scrollController.animateTo(380,
+        duration: const Duration(milliseconds: 1000), curve: Curves.ease);
+  }
+
+  // decode b64 to image
+  Image imageFromBase64String(String base64String) {
+    return Image.memory(base64Decode(base64String));
+  }
 
   // Funcion para llamar a la API de monedas
   Future<Map?> getCoins(XFile image) async {
@@ -50,8 +81,9 @@ class _CoinScreenState extends State<CoinScreen> {
     }
   }
 
-  // Predictions
+  // Obtener imagen de la galeria
   void getImageGallery() async {
+    _totalAmount = null;
     try {
       final XFile? pickedImage =
           await _picker.pickImage(source: ImageSource.gallery);
@@ -65,6 +97,15 @@ class _CoinScreenState extends State<CoinScreen> {
             _coins = value;
             _loading = false;
             setState(() {});
+            if (_coins != null) {
+              _totalAmount = _coins!['total_amount'];
+              _imageResult = imageFromBase64String(_coins!['encoded_image']);
+              setState(() {});
+              await Future.delayed(const Duration(milliseconds: 300), () {
+                scrollDown();
+                setState(() {});
+              });
+            }
           });
         }
       }
@@ -73,8 +114,9 @@ class _CoinScreenState extends State<CoinScreen> {
     }
   }
 
-  // Predictions
+  // Obtener imagen de la galeria
   void getImageCamera() async {
+    _totalAmount = null;
     try {
       final XFile? pickedImage =
           await _picker.pickImage(source: ImageSource.camera);
@@ -88,6 +130,15 @@ class _CoinScreenState extends State<CoinScreen> {
             _coins = value;
             _loading = false;
             setState(() {});
+            if (_coins != null) {
+              _totalAmount = _coins!['total_amount'];
+              _imageResult = imageFromBase64String(_coins!['encoded_image']);
+              setState(() {});
+              await Future.delayed(const Duration(milliseconds: 300), () {
+                scrollDown();
+                setState(() {});
+              });
+            }
           });
         }
       }
@@ -215,13 +266,33 @@ class _CoinScreenState extends State<CoinScreen> {
             ),
             const SizedBox(height: 32),
             _loading ? const CircularProgressIndicator() : const SizedBox(),
-            _coins != null ? Text(_coins.toString()) : const SizedBox(),
+            _totalAmount != null
+                ? Column(
+                    children: [
+                      Text(processText(_coins!)),
+                      Text(
+                        '${_totalAmount.toString()} céntimos',
+                        style: const TextStyle(
+                            fontSize: 32, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  )
+                : const SizedBox(),
             const SizedBox(height: 32),
-            _imageFile != null && _coins != null
-                ? Image.file(File(_imageFile!.path))
+            _imageResult != null && _totalAmount != null
+                ? _imageResult!
                 : const SizedBox(),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(
+          Icons.arrow_upward_outlined,
+          size: 32,
+        ),
+        onPressed: () {
+          scrollUp();
+        },
       ),
     );
   }
