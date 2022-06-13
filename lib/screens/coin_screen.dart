@@ -18,6 +18,7 @@ class _CoinScreenState extends State<CoinScreen> {
   XFile? _imageFile;
   Image? _imageResult;
   int? _totalAmount;
+  String? _outText;
   Map? _coins;
   bool _loading = false;
   final ScrollController _scrollController = ScrollController();
@@ -61,7 +62,7 @@ class _CoinScreenState extends State<CoinScreen> {
       final file = await http.MultipartFile.fromPath('file', image.path);
       imageUploadRequest.files.add(file);
       final streamResponse =
-          await imageUploadRequest.send().timeout(const Duration(seconds: 5));
+          await imageUploadRequest.send().timeout(const Duration(seconds: 300));
       final response = await http.Response.fromStream(streamResponse);
       if (response.statusCode != 200) {
         print(response.statusCode);
@@ -85,8 +86,8 @@ class _CoinScreenState extends State<CoinScreen> {
   void getImageGallery() async {
     _totalAmount = null;
     try {
-      final XFile? pickedImage =
-          await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedImage = await _picker.pickImage(
+          source: ImageSource.gallery, imageQuality: 20);
       if (pickedImage != null) {
         _imageFile = pickedImage;
         _loading = true;
@@ -98,6 +99,7 @@ class _CoinScreenState extends State<CoinScreen> {
             _loading = false;
             setState(() {});
             if (_coins != null) {
+              _outText = processText(_coins!);
               _totalAmount = _coins!['total_amount'];
               _imageResult = imageFromBase64String(_coins!['encoded_image']);
               setState(() {});
@@ -119,7 +121,7 @@ class _CoinScreenState extends State<CoinScreen> {
     _totalAmount = null;
     try {
       final XFile? pickedImage =
-          await _picker.pickImage(source: ImageSource.camera);
+          await _picker.pickImage(source: ImageSource.camera, imageQuality: 20);
       if (pickedImage != null) {
         _imageFile = pickedImage;
         _loading = true;
@@ -131,6 +133,7 @@ class _CoinScreenState extends State<CoinScreen> {
             _loading = false;
             setState(() {});
             if (_coins != null) {
+              _outText = processText(_coins!);
               _totalAmount = _coins!['total_amount'];
               _imageResult = imageFromBase64String(_coins!['encoded_image']);
               setState(() {});
@@ -266,7 +269,7 @@ class _CoinScreenState extends State<CoinScreen> {
             ),
             const SizedBox(height: 32),
             _loading ? const CircularProgressIndicator() : const SizedBox(),
-            _totalAmount != null
+            _coins != null && _totalAmount != null
                 ? Column(
                     children: [
                       Text(processText(_coins!)),
@@ -280,7 +283,13 @@ class _CoinScreenState extends State<CoinScreen> {
                 : const SizedBox(),
             const SizedBox(height: 32),
             _imageResult != null && _totalAmount != null
-                ? _imageResult!
+                ? InteractiveViewer(
+                    panEnabled: false, // Set it to false
+                    boundaryMargin: EdgeInsets.all(100),
+                    minScale: 0.5,
+                    maxScale: 2,
+                    child: _imageResult!,
+                  )
                 : const SizedBox(),
           ],
         ),
