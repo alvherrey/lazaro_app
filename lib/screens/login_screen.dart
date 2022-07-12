@@ -53,7 +53,7 @@ class _LoginForm extends StatelessWidget {
       child: Column(
         children: [
           TextFormField(
-            initialValue: 'lazaro@gmail.com',
+            // initialValue: 'lazaro@gmail.com',
             autovalidateMode: AutovalidateMode.onUserInteraction,
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
@@ -74,7 +74,7 @@ class _LoginForm extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           TextFormField(
-            initialValue: '123456',
+            // initialValue: '123456',
             autovalidateMode: AutovalidateMode.onUserInteraction,
             autocorrect: false,
             obscureText: true,
@@ -109,10 +109,10 @@ class _LoginForm extends StatelessWidget {
                     loginForm.isLoading = true;
                     // await Future.delayed(const Duration(seconds: 2));
                     // TODO importante quitar el mock del login
-                    // final String? errorMessage =
-                    //     await authService.login(loginForm.mail, loginForm.pass);
                     final String? errorMessage =
-                        await authService.login('lazaro@gmail.com', '123456');
+                        await authService.login(loginForm.mail, loginForm.pass);
+                    // final String? errorMessage =
+                    //     await authService.login('lazaro@gmail.com', '123456');
                     if (errorMessage == null) {
                       Navigator.pushReplacementNamed(context, 'home');
                       Preferences.localId = await authService.readLocalId();
