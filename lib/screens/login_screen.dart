@@ -27,11 +27,20 @@ class LoginScreen extends StatelessWidget {
               child: const _LoginForm(),
             ),
             // const SizedBox(height: 8),
+
             TextButton(
               onPressed: () =>
                   Navigator.pushReplacementNamed(context, 'register'),
               child: const Text(
                 'Crear una nueva cuenta',
+              ),
+            ),
+            TextButton(
+              onPressed: () =>
+                  Navigator.of(context).pushNamed('forgot_password'),
+              child: const Text(
+                '¿Has olvidado la contraseña?',
+                style: TextStyle(color: Colors.red),
               ),
             ),
           ],
