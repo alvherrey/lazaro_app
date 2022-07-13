@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:lazaro_app/services/notification_service.dart';
 import 'package:lazaro_app/ui/input_decorations.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -10,6 +13,12 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +48,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             const SizedBox(height: 4),
             TextFormField(
               // initialValue: 'lazaro@gmail.com',
+              controller: emailController,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               autocorrect: false,
               keyboardType: TextInputType.emailAddress,
@@ -67,7 +77,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               elevation: 0,
               color: Colors.blue,
               height: 50,
-              onPressed: () {},
+              onPressed: resetPassword,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -90,5 +100,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
       ),
     );
+  }
+
+  Future resetPassword() async {
+    try {
+      print(emailController.text);
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: emailController.text.trim());
+      NotificationService.showSnackBar('Correo de recuperacion enviado');
+    } on FirebaseAuthException catch (e) {
+      print(e);
+      NotificationService.showSnackBar(e.message!);
+    }
   }
 }
